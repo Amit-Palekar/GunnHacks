@@ -135,18 +135,6 @@ function callbackOrigin(results, status) {
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        console.log(originPOI);
-        console.log(this);
-        var index = 0;
-        for(var i = 0; i < originPOI.length; i++) {
-          console.log(originPOI[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
-          if(originPOI[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
-            index = i;
-            break;
-          }
-        }
-        originPOI[index].people++;
-        firebase.database().ref("places/").set(originPOI);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
@@ -172,18 +160,6 @@ function callbackDestination(results, status) {
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        console.log(destinationPOI);
-        console.log(this);
-        var index = 0;
-        for(var i = 0; i < destinationPOI.length; i++) {
-          console.log(destinationPOI[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
-          if(destinationPOI[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
-            index = i;
-            break;
-          }
-        }
-        destinationPOI[index].people++;
-        firebase.database().ref("places/").set(destinationPOI);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
@@ -209,15 +185,20 @@ function createMarker(place) {
   markers.push(marker);
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
-      '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
+    infowindow.setContent(place.name);
     infowindow.open(map, this);
+    console.log(poiList);
+    console.log(this);
+    var index = 0;
+    for(var i = 0; i < poiList.length; i++) {
+      if(poiList[i].name === place.name ) {
+        index = i;
+        break;
+      }
+    }
+    poiList[index].people++;
+    firebase.database().ref("places/go").set(poiList);
   });
-}
-
-function removeExcess() //remove POIs that are too similar / in same location
-{
-
 }
 
 class POI {
