@@ -1,5 +1,6 @@
 {
   "projects": {
-    "gunnhacks": "gunnhacks-1509167013046"
+    "gunnhacks": "gunnhacks-1509167013046",
+    "default": "gunnhacks-1509167013046"
   }
 }
