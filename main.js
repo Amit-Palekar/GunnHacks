@@ -10,7 +10,7 @@ window.onload = function() {
     messagingSenderId: "7288610574"
   };
   firebase.initializeApp(config);
-
+  firebase.auth().signInAnonymously();
 
 };
 
@@ -30,7 +30,7 @@ function initAutocomplete() {
   });
   var pois = getPOIs(null);
   console.log(pois);
-  getPOIs({lat: 37.3603, lng: -122.1266}) //37.3603° N, 122.1266° W
+  getPOIs({lat: 37.3603, lng: -122.1266}); //37.3603° N, 122.1266° W
   initDirections({lat: 37.3603, lng: -122.1266});
 }
 
@@ -38,10 +38,10 @@ function addDestination(dest) {
   var ref = firebase.database().ref('unassigned/');
   getLocation().then(function(loc) {
     console.log(loc);
-    var geocoder = new google.maps.Geocoder;
+    var geocoder = new google.maps.Geocoder();
     var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
     geocoder.geocode({'location': latlng}, function(results, status) {
-      var person = {current: results[0].formatted_address, dest: dest, points: names};
+      var person = {current: results[0].formatted_address, dest: dest, point: dest_waypoint};
       ref.push(person);
     });
   });
@@ -113,17 +113,18 @@ function getPOIs(targetLoc) {
 }
 
 var infowindow;
-var names = [];
+var start = [];
 function callback(results, status) {
   var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
-      names.push(results[i].name);
       var element = document.createElement("LI");
       var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
+        start.push(this.innerHTML);
+        firebase.database().ref("unassigned/" + firebase.auth().currentUser.uid).update({points: start})
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
