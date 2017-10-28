@@ -149,13 +149,13 @@ function createMarker(place) {
     infowindow.open(map, this);
   });
 }
-
+/*
 class POI {
   constructor(people, departTime) {
     this.people = people;
     this.departTime = departTime
   }
-  /*
+
   function addPerson() {
     people++;
   }
@@ -174,10 +174,8 @@ class POI {
   function getDepartTime(){
     return departTime;
   }
-  */
 
-
-}
+}*/
 function initDirections(destination) {
   var directionsDisplay = new google.maps.DirectionsRenderer;
   var directionsService = new google.maps.DirectionsService;
