@@ -123,18 +123,6 @@ function callback(results, status) {
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        console.log(poiList);
-        console.log(this);
-        var index = 0;
-        for(var i = 0; i < poiList.length; i++) {
-          console.log(poiList[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
-          if(poiList[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
-            index = i;
-            break;
-          }
-        }
-        poiList[index].people++;
-        firebase.database().ref("places/").set(poiList);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
@@ -160,6 +148,17 @@ function createMarker(place) {
     infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
       '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
     infowindow.open(map, this);
+    console.log(poiList);
+    console.log(this);
+    var index = 0;
+    for(var i = 0; i < poiList.length; i++) {
+      if(poiList[i].name === place.name ) {
+        index = i;
+        break;
+      }
+    }
+    poiList[index].people++;
+    firebase.database().ref("places/go").set(poiList);
   });
 }
 
