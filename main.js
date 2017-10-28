@@ -27,8 +27,7 @@ function initAutocomplete() {
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
   });
-  var pois = getPOIs();
-  console.log(pois);
+  getPOIs();
 }
 
 function addDestination(dest) {
@@ -38,7 +37,7 @@ function addDestination(dest) {
     var geocoder = new google.maps.Geocoder;
     var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
     geocoder.geocode({'location': latlng}, function(results, status) {
-      var person = {current: results[0].formatted_address, dest: dest};
+      var person = {current: results[0].formatted_address, dest: dest, points: names};
       ref.push(person);
     });
   });
@@ -91,17 +90,17 @@ function getPOIs() {
         radius: 1000,
         //type: ['store']
       }, callback);
-      return places;
     });
 }
 
 var map;
 var infowindow;
-
+var names = [];
 function callback(results, status) {
   var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
+      names.push(results[i].name);
       var element = document.createElement("LI");
       var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
       element.classList.add('list-group-item');
