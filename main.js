@@ -183,23 +183,25 @@ function createMarker(place) {
     position: place.geometry.location
   });
   markers.push(marker);
-  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(place.name);
+    infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
+      '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
     infowindow.open(map, this);
-    console.log(poiList);
+    console.log(destinationPOI);
     console.log(this);
     var index = 0;
-    for(var i = 0; i < poiList.length; i++) {
-      if(poiList[i].name === place.name ) {
+    for(var i = 0; i < destinationPOI.length; i++) {
+      if(destinationPOI[i].name === place.name ) {
         index = i;
         break;
       }
     }
-    poiList[index].people++;
-    firebase.database().ref("places/go").set(poiList);
+    destinationPOI[index].people++;
+    firebase.database().ref("places/go").set(destinationPOI);
   });
 }
+
 
 class POI {
   constructor(name, people, departTime) {
