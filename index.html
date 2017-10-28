@@ -17,6 +17,7 @@ window.onload = function() {
 
 };
 
+<<<<<<< HEAD
 function main()
 {
   initMap();
@@ -132,8 +133,7 @@ function createMarker(place) {
   });
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
-      infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' + 
-      '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
+      infowindow.setContent(place.name);
     infowindow.open(map, this);
   });
 }
@@ -165,6 +165,8 @@ class POI {
   */
 }
 
+=======
+>>>>>>> 99c42c49256a703cf2afc3f8882e1d61e717e071
 </script>
 
 <head>
