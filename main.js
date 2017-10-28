@@ -34,7 +34,7 @@ function initAutocomplete() {
 function addDestination(dest) {
   var ref = firebase.database().ref('unassigned/');
   getLocation().then(function(loc) {
-    console.log(loc)
+    console.log(loc);
     var geocoder = new google.maps.Geocoder;
     var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
     geocoder.geocode({'location': latlng}, function(results, status) {
@@ -99,8 +99,23 @@ var map;
 var infowindow;
 
 function callback(results, status) {
+  var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
+      var element = document.createElement("LI");
+      var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
+      element.classList.add('list-group-item');
+      element.addEventListener('click', function() {
+        var elements = document.getElementsByClassName('list-group-item');
+        for(var x = 0; x < elements.length; x++) {
+          elements[x].style.background = 'white';
+          elements[x].style.color = '#333';
+        }
+        this.style.background = 'blue';
+        this.style.color = 'white';
+      });
+      element.appendChild(text);
+      list.appendChild(element);
       createMarker(results[i]);
     }
   }
@@ -112,7 +127,7 @@ function createMarker(place) {
     map: map,
     position: place.geometry.location
   });
-
+  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
     infowindow.setContent(place.name);
     infowindow.open(map, this);
