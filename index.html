@@ -1,5 +1,171 @@
 <!doctype html>
 <html lang="en">
+<script>
+var map;
+window.onload = function() {
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyDJfecggDCSSnp1SS265blDqR182s2ZywE",
+    authDomain: "gunnhacks-1509167013046.firebaseapp.com",
+    databaseURL: "https://gunnhacks-1509167013046.firebaseio.com",
+    projectId: "gunnhacks-1509167013046",
+    storageBucket: "gunnhacks-1509167013046.appspot.com",
+    messagingSenderId: "7288610574"
+  };
+  firebase.initializeApp(config);
+
+
+};
+
+function main()
+{
+  initMap();
+  initAutocomplete();
+}
+
+function initAutocomplete() {
+  var input = document.getElementById('autocomplete');
+  var searchBox = new google.maps.places.Autocomplete(input);
+  google.maps.event.addListener(searchBox, 'place_changed', function(){
+    var place = searchBox.getPlace();
+    addDestination(place.formatted_address);
+  });
+  var pois = getPOIs();
+  console.log(pois);
+}
+
+function addDestination(dest) {
+  var ref = firebase.database().ref('unassigned/');
+  getLocation().then(function(loc) {
+    console.log(loc);
+    var geocoder = new google.maps.Geocoder;
+    var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
+    geocoder.geocode({'location': latlng}, function(results, status) {
+      var person = {current: results[0].formatted_address, dest: dest};
+      ref.push(person);
+    });
+  });
+}
+
+function initMap() {
+
+  var pyrmont = {lat: -33.867, lng: 151.195};
+
+  map = new google.maps.Map(document.getElementById('map'), {
+    center: pyrmont,
+    zoom: 15
+  });
+
+  var location = getLocation()
+    .then(function(loc) {
+      map.setCenter(loc);
+      var marker = new google.maps.Marker({
+              position: loc,
+              map: map
+      });
+    });
+
+}
+
+function getLocation() {
+  var pos;
+  var promise = new Promise(function(resolve, reject) {
+    if(navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(function(position) {
+         pos = { lat: position.coords.latitude,
+                 lng: position.coords.longitude
+               };
+          resolve(pos);
+      });
+    }
+  });
+
+  return promise;
+}
+
+function getPOIs() {
+
+  var location = getLocation()
+    .then(function(loc) {
+      infowindow = new google.maps.InfoWindow();
+      var service = new google.maps.places.PlacesService(map);
+      var places = service.nearbySearch({
+        location: loc,
+        radius: 1000,
+        //type: ['store']
+      }, callback);
+      return places;
+    });
+}
+
+var map;
+var infowindow;
+
+function callback(results, status) {
+  var list = document.getElementById('list');
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var element = document.createElement("LI");
+      var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
+      element.classList.add('list-group-item');
+      element.addEventListener('click', function() {
+        var elements = document.getElementsByClassName('list-group-item');
+        for(var x = 0; x < elements.length; x++) {
+          elements[x].style.background = 'white';
+          elements[x].style.color = '#333';
+        }
+        this.style.background = 'blue';
+        this.style.color = 'white';
+      });
+      element.appendChild(text);
+      list.appendChild(element);
+      createMarker(results[i]);
+    }
+  }
+}
+
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(place.name);
+    infowindow.open(map, this);
+  });
+}
+
+class POI {
+  constructor(people, departTime) {
+    this.people = people;
+    this.departTime = departTime
+  }
+  /*
+  function addPerson() {
+    people++;
+  }
+  function removePerson(){
+    people--;
+  }
+  function setPeople(p) {
+    people = p;
+  }
+  function getPeople() {
+    return people;
+  }
+  function setDepartTime(t){
+    departTime = t;
+  }
+  function getDepartTime(){
+    return departTime;
+  }
+  */
+}
+
+</script>
+
 <head>
 	<title>
 		FindWalkers.net	Find safe walking groups near you now!
@@ -7,11 +173,11 @@
 	<style>
 		/* Always set the map height explicitly to define the size of the div
 		 * element that contains the map. */
-
 	</style>
 	<meta charset="utf-8" />
 	<link rel="apple-touch-icon" sizes="76x76" href="assets/img/apple-icon.png">
 	<link rel="icon" type="image/png" sizes="96x96" href="assets/img/favicon.png">
+	<link rel="stylesheet" type="text/css" href="style.css">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta name="description" content="Feeling unsafe? Find a group of people to walk with you!">
 
@@ -28,17 +194,16 @@
     <!--  Paper Dashboard core CSS    -->
     <link href="assets/css/paper-dashboard.css" rel="stylesheet"/>
 
-
     <!--  CSS for Demo Purpose, don't include it in your project     -->
     <link href="assets/css/demo.css" rel="stylesheet" />
 
-
+		<script type="text/javascript" src="main.js"></script>
 
 </head>
 <body>
 
 <div class="wrapper">
-    <div class="sidebar" data-background-color="white" data-active-color="danger">
+    <div class="sidebar" data-background-color="white" data-active-color="danger" width: 50px>
 
     <!--
 		Tip 1: you can change the color of the sidebar's background using: data-background-color="white | black"
@@ -83,7 +248,7 @@
     </div>
 
     <div class="main-panel">
-        <!--<nav class="navbar navbar-default">
+        <nav class="navbar navbar-default">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <button type="button" class="navbar-toggle">
@@ -96,18 +261,12 @@
                 </div>
                 <div class="collapse navbar-collapse">
                     <ul class="nav navbar-nav navbar-right">
-                        <li>
-                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                                <i class="ti-panel"></i>
-								<p>Stats</p>
-                            </a>
-                        </li>
                         <li class="dropdown">
                               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                     <i class="ti-bell"></i>
                                     <p class="notification">5</p>
-									<p>Notifications</p>
-									<b class="caret"></b>
+																		<p>Notifications</p>
+																		<b class="caret"></b>
                               </a>
                               <ul class="dropdown-menu">
                                 <li><a href="#">Notification 1</a></li>
@@ -117,17 +276,17 @@
                                 <li><a href="#">Another notification</a></li>
                               </ul>
                         </li>
-						<li>
-                            <a href="#">
-								<i class="ti-settings"></i>
-								<p>Settings</p>
+												<li>
+                            <a href="settings.html">
+															<i class="ti-settings"></i>
+															<p>Settings</p>
                             </a>
                         </li>
                     </ul>
 
                 </div>
             </div>
-        </nav>-->
+        </nav>
 
 
         <div class="content" id="list">
@@ -199,7 +358,7 @@
                         <div class="card">
                           <div id="pac-container">
                             <input id="autocomplete" type="text"
-                                placeholder="Enter a location">
+                                placeholder="Your destination here">
                           </div>
                           <div class="content" id="map-container">
 															<div id="map"></div>
@@ -214,33 +373,22 @@
         </div>
 
 
-        <!--<footer class="footer">
+        <footer class="footer">
             <div class="container-fluid">
                 <nav class="pull-left">
                     <ul>
-
                         <li>
-                            <a href="http://www.creative-tim.com">
-                                Creative Tim
-                            </a>
-                        </li>
-                        <li>
-                            <a href="http://blog.creative-tim.com">
-                               Blog
-                            </a>
-                        </li>
-                        <li>
-                            <a href="http://www.creative-tim.com/license">
-                                Licenses
-                            </a>
+                            <p href="http://www.creative-tim.com">
+                                FindWalkers©
+                            </p>
                         </li>
                     </ul>
                 </nav>
                 <div class="copyright pull-right">
-                    &copy; <script>document.write(new Date().getFullYear())</script>, made with <i class="fa fa-heart heart"></i> by <a href="http://www.creative-tim.com">Creative Tim</a>
+                    &copy; <script>document.write(new Date().getFullYear())</script>, made with <i class="fa fa-heart heart"></i> by <a href="http://www.creative-tim.com">Team JAAAE</a>
                 </div>
             </div>
-        </footer>-->
+        </footer>
     </div>
 </div>
 <!--  Fonts and icons     -->
