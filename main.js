@@ -22,14 +22,19 @@ function main()
 function initAutocomplete() {
   var input = document.getElementById('autocomplete');
   var searchBox = new google.maps.places.Autocomplete(input);
+  var pois = getPOIs(null);
+
   google.maps.event.addListener(searchBox, 'place_changed', function(){
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
 
+    initMap();
+    var pois = getPOIs(null);
     getPOIs(place.geometry.location); //{lat: 37.3603, lng: -122.1266}
     initDirections(place.geometry.location);
+    clearMarkers();
   });
-  var pois = getPOIs(null);
+
 }
 
 function addDestination(dest) {
@@ -137,12 +142,15 @@ function callback(results, status) {
   }
 }
 
+var markers = [];
+
 function createMarker(place) {
   var placeLoc = place.geometry.location;
   var marker = new google.maps.Marker({
     map: map,
     position: place.geometry.location
   });
+  markers.push(marker);
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
     infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
@@ -162,7 +170,7 @@ function createMarker(place) {
   });
 }
 
-function removeExcess()
+function removeExcess() //remove POIs that are too similar / in same location
 {
 
 }
@@ -198,4 +206,35 @@ function calcRoute(directionsService,directionsDisplay, start,end) {
       window.alert('Directions request failed due to ' + status);
     }
   });
+}
+
+function addMarker(location) {
+  var marker = new google.maps.Marker({
+    position: location,
+    map: map
+  });
+  markers.push(marker);
+}
+
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+  setMapOnAll(null);
+}
+
+// Shows any markers currently in the array.
+function showMarkers() {
+  setMapOnAll(map);
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+  clearMarkers();
+  markers = [];
 }
