@@ -29,11 +29,17 @@ function initAutocomplete() {
     addDestination(place.formatted_address);
 
     initMap();
-    var pois = getPOIs(null);
+    getPOIs(null);
     getPOIs(place.geometry.location); //{lat: 37.3603, lng: -122.1266}
     initDirections(place.geometry.location);
+    console.log(originPOI);
+    console.log(destinationPOI);
+
     clearMarkers();
+    originPOI = [];
+    destinationPOI = [];
   });
+
 
 }
 
@@ -97,7 +103,7 @@ function getPOIs(targetLoc) {
          location: loc,
          radius: 500,
          //type: ['store']
-       }, callback);
+       }, callbackOrigin);
        return places;
      });
   }
@@ -109,37 +115,75 @@ function getPOIs(targetLoc) {
       location: targetLoc,
       radius: 500,
       //type: ['store']
-    }, callback);
+    }, callbackDestination);
     return places;
   }
 
 }
 
 var infowindow;
-var poiList = [];
-function callback(results, status) {
+var originPOI = [];
+var destinationPOI = [];
+function callbackOrigin(results, status) {
   var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       var element = document.createElement("LI");
       var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
       var obj = new POI(results[i].name, 0, 0);
-      poiList.push(obj);
+      originPOI.push(obj);
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        console.log(poiList);
+        console.log(originPOI);
         console.log(this);
         var index = 0;
-        for(var i = 0; i < poiList.length; i++) {
-          console.log(poiList[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
-          if(poiList[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
+        for(var i = 0; i < originPOI.length; i++) {
+          console.log(originPOI[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
+          if(originPOI[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
             index = i;
             break;
           }
         }
-        poiList[index].people++;
-        firebase.database().ref("places/").set(poiList);
+        originPOI[index].people++;
+        firebase.database().ref("places/").set(originPOI);
+        for(var x = 0; x < elements.length; x++) {
+          elements[x].style.background = 'white';
+          elements[x].style.color = '#333';
+        }
+        this.style.background = 'blue';
+        this.style.color = 'white';
+      });
+      element.appendChild(text);
+      list.appendChild(element);
+      createMarker(results[i]);
+    }
+  }
+}
+
+function callbackDestination(results, status) {
+  var list = document.getElementById('list');
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
+    for (var i = 0; i < results.length; i++) {
+      var element = document.createElement("LI");
+      var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
+      var obj = new POI(results[i].name, 0, 0);
+      destinationPOI.push(obj);
+      element.classList.add('list-group-item');
+      element.addEventListener('click', function() {
+        var elements = document.getElementsByClassName('list-group-item');
+        console.log(destinationPOI);
+        console.log(this);
+        var index = 0;
+        for(var i = 0; i < destinationPOI.length; i++) {
+          console.log(destinationPOI[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
+          if(destinationPOI[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
+            index = i;
+            break;
+          }
+        }
+        destinationPOI[index].people++;
+        firebase.database().ref("places/").set(destinationPOI);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
