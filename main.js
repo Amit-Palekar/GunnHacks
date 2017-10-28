@@ -22,14 +22,19 @@ function main()
 function initAutocomplete() {
   var input = document.getElementById('autocomplete');
   var searchBox = new google.maps.places.Autocomplete(input);
+  var pois = getPOIs(null);
+
   google.maps.event.addListener(searchBox, 'place_changed', function(){
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
+
+    initMap();
+    var pois = getPOIs(null);
+    getPOIs(place.geometry.location); //{lat: 37.3603, lng: -122.1266}
+    initDirections(place.geometry.location);
+    clearMarkers();
   });
-  var pois = getPOIs(null);
-  console.log(pois);
-  getPOIs({lat: 37.3603, lng: -122.1266}); //37.3603° N, 122.1266° W
-  initDirections({lat: 37.3603, lng: -122.1266});
+
 }
 
 function addDestination(dest) {
@@ -123,18 +128,6 @@ function callback(results, status) {
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        console.log(poiList);
-        console.log(this);
-        var index = 0;
-        for(var i = 0; i < poiList.length; i++) {
-          console.log(poiList[i].name + " " + this.innerHTML)
-          if(poiList[i].name === this.innerHTML) {
-            index = i;
-            break;
-          }
-        }
-        poiList[index].people++;
-        firebase.database().ref("places/").set(poiList);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
@@ -149,19 +142,41 @@ function callback(results, status) {
   }
 }
 
+var markers = [];
+
 function createMarker(place) {
   var placeLoc = place.geometry.location;
   var marker = new google.maps.Marker({
     map: map,
     position: place.geometry.location
   });
+  markers.push(marker);
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
     infowindow.setContent(place.name);
     infowindow.open(map, this);
+    console.log(poiList);
+    console.log(this);
+    var index = 0;
+    for(var i = 0; i < poiList.length; i++) {
+      if(poiList[i].name === place.name ) {
+        index = i;
+        break;
+      }
+    }
+    poiList[index].people++;
+    firebase.database().ref("places/go").set(poiList);
   });
 }
 
+<<<<<<< HEAD
+=======
+function removeExcess() //remove POIs that are too similar / in same location
+{
+
+}
+
+>>>>>>> 8a397152c2670870ea3c0e4a1703c5479ebd1f48
 class POI {
   constructor(name, people, departTime) {
     this.name = name;
@@ -193,4 +208,35 @@ function calcRoute(directionsService,directionsDisplay, start,end) {
       window.alert('Directions request failed due to ' + status);
     }
   });
+}
+
+function addMarker(location) {
+  var marker = new google.maps.Marker({
+    position: location,
+    map: map
+  });
+  markers.push(marker);
+}
+
+// Sets the map on all markers in the array.
+function setMapOnAll(map) {
+  for (var i = 0; i < markers.length; i++) {
+    markers[i].setMap(map);
+  }
+}
+
+// Removes the markers from the map, but keeps them in the array.
+function clearMarkers() {
+  setMapOnAll(null);
+}
+
+// Shows any markers currently in the array.
+function showMarkers() {
+  setMapOnAll(map);
+}
+
+// Deletes all markers in the array by removing references to them.
+function deleteMarkers() {
+  clearMarkers();
+  markers = [];
 }
