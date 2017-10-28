@@ -18,6 +18,7 @@ function main()
 {
   initMap();
   initAutocomplete();
+
 }
 
 function initAutocomplete() {
@@ -27,26 +28,32 @@ function initAutocomplete() {
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
   });
-  var pois = getPOIs();
+  var pois = getPOIs(null);
+  console.log(pois);
+  getPOIs({lat: 37.3603, lng: -122.1266}) //37.3603° N, 122.1266° W
+  initDirections({lat: 37.3603, lng: -122.1266});
 }
 
 function addDestination(dest) {
   var ref = firebase.database().ref('unassigned/');
   getLocation().then(function(loc) {
-    console.log(loc)
+    console.log(loc);
     var geocoder = new google.maps.Geocoder;
     var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
     geocoder.geocode({'location': latlng}, function(results, status) {
-      var person = {current: results[0].formatted_address, dest: dest};
+      var person = {current: results[0].formatted_address, dest: dest, points: names};
       ref.push(person);
     });
   });
 }
 
 function initMap() {
+
+  var pyrmont = {lat: -33.867, lng: 151.195};
+
   map = new google.maps.Map(document.getElementById('map'), {
-    center: {lat: -34.397, lng: 150.644},
-    zoom: 2
+    center: pyrmont,
+    zoom: 15
   });
 
   var location = getLocation()
@@ -57,6 +64,7 @@ function initMap() {
               map: map
       });
     });
+
 }
 
 function getLocation() {
@@ -75,32 +83,122 @@ function getLocation() {
   return promise;
 }
 
-function getPOIs() {
+function getPOIs(targetLoc) {
 
-  var request = {
-    location: location,
-    radius: '500', // radius of 500 meters
-    // type: ['restaurant']
-  };
+  if(targetLoc == null) {
+    var location = getLocation()
+     .then(function(loc) {
+       infowindow = new google.maps.InfoWindow();
+       var service = new google.maps.places.PlacesService(map);
+       var places = service.nearbySearch({
+         location: loc,
+         radius: 500,
+         //type: ['store']
+       }, callback);
+       return places;
+     });
+  }
 
-console.log(map);
-  service = new google.maps.places.PlacesService(map);
-  //var places = service.nearbySearch(request, callback);
-  var places = service.nearbySearch({
-    location: location,
-    radius: 500,
-    //type: ['pub']
-  }, (results, status) => {
-    this.callback(results, status);
-  });
-  return places;
+  else {
+    infowindow = new google.maps.InfoWindow();
+    var service = new google.maps.places.PlacesService(map);
+    var places = service.nearbySearch({
+      location: targetLoc,
+      radius: 500,
+      //type: ['store']
+    }, callback);
+    return places;
+  }
+
 }
 
+var infowindow;
+var names = [];
 function callback(results, status) {
-  if (status == google.maps.places.PlacesServiceStatus.OK) {
+  var list = document.getElementById('list');
+  if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
-      var place = results[i];
+      names.push(results[i].name);
+      var element = document.createElement("LI");
+      var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
+      element.classList.add('list-group-item');
+      element.addEventListener('click', function() {
+        var elements = document.getElementsByClassName('list-group-item');
+        for(var x = 0; x < elements.length; x++) {
+          elements[x].style.background = 'white';
+          elements[x].style.color = '#333';
+        }
+        this.style.background = 'blue';
+        this.style.color = 'white';
+      });
+      element.appendChild(text);
+      list.appendChild(element);
       createMarker(results[i]);
     }
   }
+}
+
+function createMarker(place) {
+  var placeLoc = place.geometry.location;
+  var marker = new google.maps.Marker({
+    map: map,
+    position: place.geometry.location
+  });
+  marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
+  google.maps.event.addListener(marker, 'click', function() {
+    infowindow.setContent(place.name);
+    infowindow.open(map, this);
+  });
+}
+/*
+class POI {
+  constructor(people, departTime) {
+    this.people = people;
+    this.departTime = departTime
+  }
+
+  function addPerson() {
+    people++;
+  }
+  function removePerson(){
+    people--;
+  }
+  function setPeople(p) {
+    people = p;
+  }
+  function getPeople() {
+    return people;
+  }
+  function setDepartTime(t){
+    departTime = t;
+  }
+  function getDepartTime(){
+    return departTime;
+  }
+
+}*/
+function initDirections(destination) {
+  var directionsDisplay = new google.maps.DirectionsRenderer;
+  var directionsService = new google.maps.DirectionsService;
+  directionsDisplay.setMap(map);
+  var location = getLocation()
+   .then(function(loc) {
+     calcRoute(directionsService,directionsDisplay, loc, destination); //37.3603° N, 122.1266° W
+   });
+}
+
+function calcRoute(directionsService,directionsDisplay, start,end) {
+  var request = {
+    origin: start, //start,
+    destination: end, //end,
+    travelMode: 'WALKING'
+  };
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      directionsDisplay.setDirections(result);
+    }
+    else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  });
 }
