@@ -24,6 +24,7 @@ function initAutocomplete() {
   map.addListener('bounds_changed', function() {
     searchBox.setBounds(map.getBounds());
   });
+  var pois = getPOIs();
 }
 
 function addDestination() {
@@ -44,8 +45,6 @@ function initMap() {
               map: map
       });
     });
-
-  var pois = getPOIs();
 }
 
 function getLocation() {
@@ -72,7 +71,7 @@ function getPOIs() {
     // type: ['restaurant']
   };
 
-
+console.log(map);
   service = new google.maps.places.PlacesService(map);
   //var places = service.nearbySearch(request, callback);
   var places = service.nearbySearch({
