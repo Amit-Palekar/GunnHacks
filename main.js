@@ -21,20 +21,26 @@ function main()
 }
 
 function initAutocomplete() {
-  var input = document.getElementById('pac-input');
-  console.log(input);
-  var searchBox = new google.maps.places.SearchBox(input);
-  //map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
-
-  // Bias the SearchBox results towards current map's viewport.
-  map.addListener('bounds_changed', function() {
-    searchBox.setBounds(map.getBounds());
+  var input = document.getElementById('autocomplete');
+  var searchBox = new google.maps.places.Autocomplete(input);
+  google.maps.event.addListener(searchBox, 'place_changed', function(){
+    var place = searchBox.getPlace();
+    addDestination(place.formatted_address);
   });
   var pois = getPOIs();
 }
 
-function addDestination() {
-  var ref = firebase.db().ref('unassigned');
+function addDestination(dest) {
+  var ref = firebase.database().ref('unassigned/');
+  getLocation().then(function(loc) {
+    console.log(loc)
+    var geocoder = new google.maps.Geocoder;
+    var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
+    geocoder.geocode({'location': latlng}, function(results, status) {
+      var person = {current: results[0].formatted_address, dest: dest};
+      ref.push(person);
+    });
+  });
 }
 
 function initMap() {

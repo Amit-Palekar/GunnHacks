@@ -10,6 +10,16 @@
   margin: 0;
 }
 
-#pac-input{
-  width: 100%;
+#pac-container{
+  padding-top: 10px;
+}
+
+#autocomplete{
+  width: 96%;
+  min-height: 30px;
+  padding: 10px;
+  margin: auto;
+  display: block;
+  border-radius: 4px transparent;
+  box-shadow: none
 }
