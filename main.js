@@ -45,14 +45,14 @@ function initAutocomplete() {
 
 function addDestination(dest) {
   var ref = firebase.database().ref('places/');
-  getLocation().then(function(loc) {
-    console.log(loc);
-    var geocoder = new google.maps.Geocoder();
-    var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
-    geocoder.geocode({'location': latlng}, function(results, status) {
-      var person = {current: results[0].formatted_address, dest: dest, point: dest_waypoint};
-      ref.push(person);
-    });
+    getLocation().then(function(loc) {
+      console.log(loc);
+      var geocoder = new google.maps.Geocoder();
+      var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
+      geocoder.geocode({'location': latlng}, function(results, status) {
+        var person = {current: results[0].formatted_address, dest: dest, point: dest_waypoint};
+        ref.push(person);
+      });
   });
 }
 
@@ -184,21 +184,33 @@ function createMarker(place) {
   });
   markers.push(marker);
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png');
+  console.log(destinationPOI);
+  console.log(this);
+  var index = 0;
+  for(var i = 0; i < destinationPOI.length; i++) {
+    if(destinationPOI[i].name === place.name ) {
+      index = i;
+      break;
+    }
+  }
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
-      '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
+    infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + destinationPOI[index].people + ' attending' + '</p>' +
+      '<button onclick="myFunction()">Make this my Rendezvous Point</button>'); //place.people
     infowindow.open(map, this);
-    console.log(destinationPOI);
-    console.log(this);
-    var index = 0;
-    for(var i = 0; i < destinationPOI.length; i++) {
-      if(destinationPOI[i].name === place.name ) {
+    //console.log(originPOI);
+
+    /*
+    index = 0;
+    for(var i = 0; i < originPOI.length; i++) {
+      if(originPOI[i].name === place.name ) {
         index = i;
         break;
       }
-    }
+    }*/
     destinationPOI[index].people++;
     firebase.database().ref("places/go").set(destinationPOI);
+    //originPOI[index].people++;
+    //firebase.database().ref("places/come").set(originPOI);
   });
 }
 
