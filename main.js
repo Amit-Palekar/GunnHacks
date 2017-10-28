@@ -10,7 +10,7 @@ window.onload = function() {
     messagingSenderId: "7288610574"
   };
   firebase.initializeApp(config);
-  firebase.auth().signInAnonymously();
+
 
 };
 
@@ -18,7 +18,6 @@ function main()
 {
   initMap();
   initAutocomplete();
-
 }
 
 function initAutocomplete() {
@@ -28,20 +27,18 @@ function initAutocomplete() {
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
   });
-  var pois = getPOIs(null);
+  var pois = getPOIs();
   console.log(pois);
-  getPOIs({lat: 37.3603, lng: -122.1266}); //37.3603° N, 122.1266° W
-  initDirections({lat: 37.3603, lng: -122.1266});
 }
 
 function addDestination(dest) {
   var ref = firebase.database().ref('unassigned/');
   getLocation().then(function(loc) {
     console.log(loc);
-    var geocoder = new google.maps.Geocoder();
+    var geocoder = new google.maps.Geocoder;
     var latlng = new google.maps.LatLng({lat: loc.lat, lng: loc.lng});
     geocoder.geocode({'location': latlng}, function(results, status) {
-      var person = {current: results[0].formatted_address, dest: dest, point: dest_waypoint};
+      var person = {current: results[0].formatted_address, dest: dest};
       ref.push(person);
     });
   });
@@ -83,50 +80,33 @@ function getLocation() {
   return promise;
 }
 
-function getPOIs(targetLoc) {
+function getPOIs() {
 
-  if(targetLoc == null) {
-    var location = getLocation()
-     .then(function(loc) {
-       infowindow = new google.maps.InfoWindow();
-       var service = new google.maps.places.PlacesService(map);
-       var places = service.nearbySearch({
-         location: loc,
-         radius: 500,
-         //type: ['store']
-       }, callback);
-       return places;
-     });
-  }
-
-  else {
-    infowindow = new google.maps.InfoWindow();
-    var service = new google.maps.places.PlacesService(map);
-    var places = service.nearbySearch({
-      location: targetLoc,
-      radius: 500,
-      //type: ['store']
-    }, callback);
-    return places;
-  }
-
+  var location = getLocation()
+    .then(function(loc) {
+      infowindow = new google.maps.InfoWindow();
+      var service = new google.maps.places.PlacesService(map);
+      var places = service.nearbySearch({
+        location: loc,
+        radius: 1000,
+        //type: ['store']
+      }, callback);
+      return places;
+    });
 }
 
+var map;
 var infowindow;
-var poiList = [];
+
 function callback(results, status) {
   var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       var element = document.createElement("LI");
       var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
-      var obj = new POI(results[i].name, 0, 0);
-      poiList.push(obj);
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        start.push(this.innerHTML);
-        firebase.database().ref("unassigned/" + firebase.auth().currentUser.uid).update({points: start})
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
@@ -155,35 +135,28 @@ function createMarker(place) {
 }
 
 class POI {
-  constructor(name, people, departTime) {
-    this.name = name;
+  constructor(people, departTime) {
     this.people = people;
     this.departTime = departTime
   }
-
-}
-function initDirections(destination) {
-  var directionsDisplay = new google.maps.DirectionsRenderer;
-  var directionsService = new google.maps.DirectionsService;
-  directionsDisplay.setMap(map);
-  var location = getLocation()
-   .then(function(loc) {
-     calcRoute(directionsService,directionsDisplay, loc, destination); //37.3603° N, 122.1266° W
-   });
-}
-
-function calcRoute(directionsService,directionsDisplay, start,end) {
-  var request = {
-    origin: start, //start,
-    destination: end, //end,
-    travelMode: 'WALKING'
-  };
-  directionsService.route(request, function(result, status) {
-    if (status == 'OK') {
-      directionsDisplay.setDirections(result);
-    }
-    else {
-      window.alert('Directions request failed due to ' + status);
-    }
-  });
+  /*
+  function addPerson() {
+    people++;
+  }
+  function removePerson(){
+    people--;
+  }
+  function setPeople(p) {
+    people = p;
+  }
+  function getPeople() {
+    return people;
+  }
+  function setDepartTime(t){
+    departTime = t;
+  }
+  function getDepartTime(){
+    return departTime;
+  }
+  */
 }
