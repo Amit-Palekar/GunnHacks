@@ -24,44 +24,10 @@ function initAutocomplete() {
   map.addListener('bounds_changed', function() {
     searchBox.setBounds(map.getBounds());
   });
-
-  searchBox.addListener('places_changed', function() {
-    var places = searchBox.getPlaces();
-
-    if (places.length == 0) {
-      return;
-    }
-
-    var icon = {
-      url: place.icon,
-      size: new google.maps.Size(71, 71),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(17, 34),
-      scaledSize: new google.maps.Size(25, 25)
-    };
-
-    var bounds = new google.maps.LatLngBounds();
-    places.forEach(function(place) {
-      if (!place.geometry) {
-        console.log("Returned place contains no geometry");
-        return;
-      }
-      // Create a marker for each place.
-      markers.push(new google.maps.Marker({
-        map: map,
-        icon: icon,
-        title: place.name,
-        position: place.geometry.location
-      }));
-    });
-    map.fitBounds(bounds);
-  });
-  //var pois = getPOIs();
 }
 
 function addDestination() {
   var ref = firebase.db().ref('unassigned');
-  //ref.push()
 }
 
 function initMap() {
@@ -78,6 +44,8 @@ function initMap() {
               map: map
       });
     });
+
+  var pois = getPOIs();
 }
 
 function getLocation() {
@@ -101,12 +69,19 @@ function getPOIs() {
   var request = {
     location: location,
     radius: '500', // radius of 500 meters
-     type: ['restaurant']
+    // type: ['restaurant']
   };
 
-  var service = new google.maps.places.PlacesService(map);
-  var places = service.nearbySearch(request, callback);
 
+  service = new google.maps.places.PlacesService(map);
+  //var places = service.nearbySearch(request, callback);
+  var places = service.nearbySearch({
+    location: location,
+    radius: 500,
+    //type: ['pub']
+  }, (results, status) => {
+    this.callback(results, status);
+  });
   return places;
 }
 
