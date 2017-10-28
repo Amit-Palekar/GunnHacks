@@ -33,7 +33,7 @@ function initAutocomplete() {
 }
 
 function addDestination(dest) {
-  var ref = firebase.database().ref('unassigned/');
+  var ref = firebase.database().ref('places/');
   getLocation().then(function(loc) {
     console.log(loc);
     var geocoder = new google.maps.Geocoder();
@@ -123,8 +123,18 @@ function callback(results, status) {
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
-        start.push(this.innerHTML);
-        firebase.database().ref("unassigned/" + firebase.auth().currentUser.uid).update({points: start})
+        console.log(poiList);
+        console.log(this);
+        var index = 0;
+        for(var i = 0; i < poiList.length; i++) {
+          console.log(poiList[i].name + " " + this.innerHTML)
+          if(poiList[i].name === this.innerHTML) {
+            index = i;
+            break;
+          }
+        }
+        poiList[index].people++;
+        firebase.database().ref("places/").set(poiList);
         for(var x = 0; x < elements.length; x++) {
           elements[x].style.background = 'white';
           elements[x].style.color = '#333';
