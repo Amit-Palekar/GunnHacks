@@ -113,13 +113,15 @@ function getPOIs(targetLoc) {
 }
 
 var infowindow;
-
+var poiList = [];
 function callback(results, status) {
   var list = document.getElementById('list');
   if (status === google.maps.places.PlacesServiceStatus.OK) {
     for (var i = 0; i < results.length; i++) {
       var element = document.createElement("LI");
       var text = document.createTextNode("Name: " + results[i].name + ", Vicinity: " + results[i].vicinity);
+      POI obj = new POI(results[i].name, 0, 0);
+      poiList.push(obj);
       element.classList.add('list-group-item');
       element.addEventListener('click', function() {
         var elements = document.getElementsByClassName('list-group-item');
@@ -149,33 +151,15 @@ function createMarker(place) {
     infowindow.open(map, this);
   });
 }
-/*
+
 class POI {
-  constructor(people, departTime) {
+  constructor(name, people, departTime) {
+    this.name = name;
     this.people = people;
     this.departTime = departTime
   }
 
-  function addPerson() {
-    people++;
-  }
-  function removePerson(){
-    people--;
-  }
-  function setPeople(p) {
-    people = p;
-  }
-  function getPeople() {
-    return people;
-  }
-  function setDepartTime(t){
-    departTime = t;
-  }
-  function getDepartTime(){
-    return departTime;
-  }
-
-}*/
+}
 function initDirections(destination) {
   var directionsDisplay = new google.maps.DirectionsRenderer;
   var directionsService = new google.maps.DirectionsService;
