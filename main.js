@@ -11,14 +11,12 @@ window.onload = function() {
   };
   firebase.initializeApp(config);
   firebase.auth().signInAnonymously();
-
 };
 
 function main()
 {
   initMap();
   initAutocomplete();
-
 }
 
 function initAutocomplete() {
@@ -154,11 +152,16 @@ function createMarker(place) {
   });
 }
 
+function removeExcess()
+{
+
+}
+
 class POI {
   constructor(name, people, departTime) {
     this.name = name;
     this.people = people;
-    this.departTime = departTime
+    this.departTime = departTime;
   }
 }
 function initDirections(destination) {
