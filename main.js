@@ -18,6 +18,7 @@ function main()
 {
   initMap();
   initAutocomplete();
+
 }
 
 function initAutocomplete() {
@@ -27,8 +28,10 @@ function initAutocomplete() {
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
   });
-  var pois = getPOIs();
+  var pois = getPOIs(null);
   console.log(pois);
+  getPOIs({lat: 37.3603, lng: -122.1266}) //37.3603° N, 122.1266° W
+  initDirections({lat: 37.3603, lng: -122.1266});
 }
 
 function addDestination(dest) {
@@ -80,22 +83,35 @@ function getLocation() {
   return promise;
 }
 
-function getPOIs() {
+function getPOIs(targetLoc) {
 
-  var location = getLocation()
-    .then(function(loc) {
-      infowindow = new google.maps.InfoWindow();
-      var service = new google.maps.places.PlacesService(map);
-      var places = service.nearbySearch({
-        location: loc,
-        radius: 1000,
-        //type: ['store']
-      }, callback);
-      return places;
-    });
+  if(targetLoc == null) {
+    var location = getLocation()
+     .then(function(loc) {
+       infowindow = new google.maps.InfoWindow();
+       var service = new google.maps.places.PlacesService(map);
+       var places = service.nearbySearch({
+         location: loc,
+         radius: 500,
+         //type: ['store']
+       }, callback);
+       return places;
+     });
+  }
+
+  else {
+    infowindow = new google.maps.InfoWindow();
+    var service = new google.maps.places.PlacesService(map);
+    var places = service.nearbySearch({
+      location: targetLoc,
+      radius: 500,
+      //type: ['store']
+    }, callback);
+    return places;
+  }
+
 }
 
-var map;
 var infowindow;
 
 function callback(results, status) {
@@ -146,4 +162,29 @@ class POI {
   */
 
 
+}
+function initDirections(destination) {
+  var directionsDisplay = new google.maps.DirectionsRenderer;
+  var directionsService = new google.maps.DirectionsService;
+  directionsDisplay.setMap(map);
+  var location = getLocation()
+   .then(function(loc) {
+     calcRoute(directionsService,directionsDisplay, loc, destination); //37.3603° N, 122.1266° W
+   });
+}
+
+function calcRoute(directionsService,directionsDisplay, start,end) {
+  var request = {
+    origin: start, //start,
+    destination: end, //end,
+    travelMode: 'WALKING'
+  };
+  directionsService.route(request, function(result, status) {
+    if (status == 'OK') {
+      directionsDisplay.setDirections(result);
+    }
+    else {
+      window.alert('Directions request failed due to ' + status);
+    }
+  });
 }
