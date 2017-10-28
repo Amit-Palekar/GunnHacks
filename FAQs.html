@@ -33,7 +33,17 @@
     <link href="assets/css/demo.css" rel="stylesheet" />
 
 
-
+    <!--  Fonts and icons     -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
+    <link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
+    <link href="assets/css/themify-icons.css" rel="stylesheet">
+		<script src="./main.js"></script>
+		<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyurMUUxTrhp6L0D9LPbcZ_XEI-vD1ZJ4&callback=initMap"
+		async defer></script>
+		<!--   Core JS Files   -->
+	  <script src="assets/js/jquery-1.10.2.js" type="text/javascript"></script>
+		<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
+		<link href="./assets/css/style.css" type="text/css" rel="stylesheet">
 </head>
 <body>
 
@@ -54,7 +64,7 @@
             </div>
 
             <ul class="nav">
-								<li class="active">
+								<li>
 										<a href="index.html">
 												<i class="ti-home"></i>
 												<p>Home</p>
@@ -72,7 +82,7 @@
                         <p>About Us</p>
                     </a>
                 </li>
-                <li>
+                <li class="active">
                     <a href="FAQs.html">
                         <i class="ti-view-list-alt"></i>
                         <p>FAQs</p>
@@ -133,77 +143,42 @@
         <div class="content">
             <div class="container-fluid">
                 <div class="row">
-									<center>
-                    <div class="col-lg-3 col-sm-6">
+										<div class="col-lg-10 col-sm-10">
                         <div class="card">
                             <div class="content">
 															<font size="7">
- 																				Make a Group
-                                <div class="row">
-                                    <div class="col-xs-10">
-                                        <div align = "center">
-                                            <div class="icon-big icon-danger text-center">
-                                                <i class="ti-announcement"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-7">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-3 col-sm-6">
-                        <div class="card">
-                            <div class="content">
-															<font size="7">
-																				Find a Group
+                                Frequently asked questions:
                                 <div class="row">
                                     <div class="col-xs-10">
                                         <div class="icon-big icon-info text-center">
-                                            <i class="ti-location-arrow"></i>
-                                        </div>
-                                    </div>
-                                    <div class="col-xs-7">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-									</center>
-										<!--<div class="col-lg-4 col-sm-6">
-                        <div class="card">
-                            <div class="content">
-															<font size="6">
-																	<i class="ti-info"></i>
-																				Description:
-                                <div class="row">
-                                    <div class="col-xs-5">
-                                        <div class="icon-big icon-info text-center">
-																						<p>
-																							<font size="2" color = "black">
-																								This website enables you to find people around you to walk through unsafe
-																						 	neighborhoods with you. To start, choose either Find a Group or Join a Group
-																				  	</p>
-																			  	</div>
+                                            <div align = "left">
+												<p>
+													<font size="3" color = "black">
+												Q: What happens if somebody is outside the one mile radius? <br>
+                                                A: They won't be detected, so you will not have to wait long <br>
+                                                Q: What if criminals use the app to find people who are alone? <br>
+                                                A: We have a minimum group of 5 people, so you will not be taken advantage of<br>
+												</p>
+                                                </div>
+											</div>
                                     	</div>
                                     <div class="col-xs-7">
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>-->
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-md-12">
                         <div class="card">
-                          <div id="pac-container">
-                            <input id="autocomplete" type="text"
-                                placeholder="Enter a location">
-                          </div>
-                          <div class="content" id="map-container">
-															<div id="map"></div>
-                          </div>
+                            <div class="header">
+                                <h4 class="title">Your Current Map</h4>
+                                <p class="category">Each dot represents a group of walkers</p>
+                            </div>
+                            <div class="content" id="map-container">
+																<div id="map"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -240,19 +215,7 @@
         </footer>-->
     </div>
 </div>
-<!--  Fonts and icons     -->
-<link href="http://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css" rel="stylesheet">
-<link href='https://fonts.googleapis.com/css?family=Muli:400,300' rel='stylesheet' type='text/css'>
-<link href="assets/css/themify-icons.css" rel="stylesheet">
-<script src="https://www.gstatic.com/firebasejs/4.6.0/firebase.js"></script>
-<script src="./main.js"></script>
-<!--<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyurMUUxTrhp6L0D9LPbcZ_XEI-vD1ZJ4&libraries=places&callback=main" -->
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCyurMUUxTrhp6L0D9LPbcZ_XEI-vD1ZJ4&libraries=places&callback=main">
-async defer></script>
-<!--   Core JS Files   -->
-<script src="assets/js/jquery-1.10.2.js" type="text/javascript"></script>
-<script src="assets/js/bootstrap.min.js" type="text/javascript"></script>
-<link href="./assets/css/style.css" type="text/css" rel="stylesheet">
+
 
 </body>
 </html>
