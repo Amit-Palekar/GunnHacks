@@ -25,11 +25,11 @@ function initAutocomplete() {
   google.maps.event.addListener(searchBox, 'place_changed', function(){
     var place = searchBox.getPlace();
     addDestination(place.formatted_address);
+
+    getPOIs(place.geometry.location); //{lat: 37.3603, lng: -122.1266}
+    initDirections(place.geometry.location);
   });
   var pois = getPOIs(null);
-  console.log(pois);
-  getPOIs({lat: 37.3603, lng: -122.1266}); //37.3603° N, 122.1266° W
-  initDirections({lat: 37.3603, lng: -122.1266});
 }
 
 function addDestination(dest) {
@@ -127,8 +127,8 @@ function callback(results, status) {
         console.log(this);
         var index = 0;
         for(var i = 0; i < poiList.length; i++) {
-          console.log(poiList[i].name + " " + this.innerHTML)
-          if(poiList[i].name === this.innerHTML) {
+          console.log(poiList[i].name + "\t" + this.innerHTML.substring(6, this.innerHTML.lastIndexOf(",")))
+          if(poiList[i].name === this.innerHTML.substring(6, this.innerHTML.indexOf(","))) {
             index = i;
             break;
           }
