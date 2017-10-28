@@ -11,14 +11,12 @@ window.onload = function() {
   };
   firebase.initializeApp(config);
   firebase.auth().signInAnonymously();
-
 };
 
 function main()
 {
   initMap();
   initAutocomplete();
-
 }
 
 function initAutocomplete() {
@@ -159,16 +157,22 @@ function createMarker(place) {
   });
   marker.setIcon('http://maps.google.com/mapfiles/ms/icons/green-dot.png')
   google.maps.event.addListener(marker, 'click', function() {
-    infowindow.setContent(place.name);
+    infowindow.setContent('<p>' + place.name + '</p>' + '<p>' + place.people + ' attending' + '</p>' +
+      '<button onclick="myFunction()">Make this my Rendezvous Point</button>');
     infowindow.open(map, this);
   });
+}
+
+function removeExcess()
+{
+
 }
 
 class POI {
   constructor(name, people, departTime) {
     this.name = name;
     this.people = people;
-    this.departTime = departTime
+    this.departTime = departTime;
   }
 }
 function initDirections(destination) {
