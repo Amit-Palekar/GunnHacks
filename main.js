@@ -160,7 +160,6 @@ class POI {
     this.people = people;
     this.departTime = departTime
   }
-
 }
 function initDirections(destination) {
   var directionsDisplay = new google.maps.DirectionsRenderer;
